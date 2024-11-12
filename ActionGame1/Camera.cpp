@@ -38,8 +38,7 @@ void Camera::Update(const Player& player)
     // カメラに位置を反映.
 
     targetposition = VAdd(player.GetPos(), VGet(-0.0f, TargetHight, 0.0f));
-
-
+    position = VAdd(player.GetPos(), VGet(-0.0f, Hight, Zoom));
 
     // カメラに位置を反映.
     SetCameraPositionAndTarget_UpVecY(position, targetposition);

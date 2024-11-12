@@ -1,13 +1,4 @@
-﻿  Box.cpp
-  Camera.cpp
-  Color.cpp
-  Input.cpp
+﻿  Stage.cpp
   main.cpp
-  Player.cpp
-D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame\ActionGame1\Player.cpp(121,35): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
-D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame\ActionGame1\Player.cpp(147,9): warning C4101: 'MoveVec': ローカル変数は 1 度も使われていません。
-  Skydome.cpp
-D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame\ActionGame1\Skydome.cpp(24,20): warning C4305: '-=': 'double' から 'float' へ切り詰めます。
-D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame\ActionGame1\Skydome.cpp(30,19): warning C4305: '-=': 'double' から 'float' へ切り詰めます。
   コードを生成中...
-  MyDxLibGame3D.vcxproj -> D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame\ActionGame1\Debug\MyDxLibGame3D.exe
+  MyDxLibGame3D.vcxproj -> D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Debug\MyDxLibGame3D.exe

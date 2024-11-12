@@ -8,6 +8,9 @@
     <Filter Include="MyLib">
       <UniqueIdentifier>{a7470f37-c5c2-41b7-b850-d52ad8defc41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{5541fda2-d8d2-497c-9729-c3f2e0b56939}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -28,8 +31,11 @@
     <ClCompile Include="Camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Stage.cpp">
+      <Filter>Environment</Filter>
+    </ClCompile>
     <ClCompile Include="Skydome.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -51,8 +57,11 @@
     <ClInclude Include="Camera.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Stage.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
     <ClInclude Include="Skydome.h">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Environment</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

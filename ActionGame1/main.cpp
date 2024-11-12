@@ -1,8 +1,10 @@
 #include"DxLib.h"
 #include"EffekseerForDXLib.h"
 #include"Camera.h"
+#include"Input.h"
 #include"Player.h"
 #include"Skydome.h"
+#include"Stage.h"
 enum STATE
 {
 	STATE_INIT,
@@ -44,9 +46,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	ChangeFont("ラノベPOP v2", DX_CHARSET_DEFAULT);
 
 	// インスタンス生成
-	Player* player = new Player();
-	Camera* camera = new Camera();
 	Skydome* dome = new Skydome();
+	Stage* stage = new Stage();
+	Input* input = new Input();
+	Camera* camera = new Camera();
+	Player* player = new Player();
+
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	LONGLONG frameTime = 0;
 
@@ -54,7 +59,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	bool debugPauseFlag = false;
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
-		printfDx("%d\n", gameStatus);
+		
 		// フレーム開始時の時間を取得
 		int startTime = GetNowCount();
 		// ぼたんおしたら
@@ -77,6 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//全ての初期化
 			if (gameStatus == STATE_INIT)
 			{
+				stage->Load();
 				player->Load();
 				camera->Load();
 
@@ -92,7 +98,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				ClearDrawScreen();
 
 				//描画
-
+				printf("start");
 
 				// ゲーム状態変化
 				if (CheckHitKey(KEY_INPUT_SPACE))
@@ -121,9 +127,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 				//ゲームシーンの制御
 
-
+				//パッドの制御
+				input->Update();
 				// プレイヤー制御
-				player->Update();
+				player->Update(*input);
 				// カメラの制御
 				camera->Update(*player);
 				// スカイドーム制御
@@ -143,6 +150,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 				// 描画
 				dome->SkydomeDraw();
+				stage->Draw();
 				player->Draw();
 				
 
