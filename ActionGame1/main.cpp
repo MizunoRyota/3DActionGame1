@@ -1,10 +1,12 @@
 #include"DxLib.h"
 #include"EffekseerForDXLib.h"
-#include"Camera.h"
-#include"Input.h"
-#include"Player.h"
+#include"Pallet.h"
 #include"Skydome.h"
 #include"Stage.h"
+#include"Input.h"
+#include"Camera.h"
+#include"Player.h"
+#include"HitChecker.h"
 enum STATE
 {
 	STATE_INIT,
@@ -29,7 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// 画面モードのセット
 	ChangeWindowMode(TRUE);
-	SetGraphMode(1600, 900, 16);
+	SetGraphMode(800, 600, 16);
 
 	SetDrawScreen(DX_SCREEN_BACK);	// 裏画面を描画対象にする
 	SetUseZBufferFlag(TRUE);		// Ｚバッファを使用する
@@ -51,6 +53,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Input* input = new Input();
 	Camera* camera = new Camera();
 	Player* player = new Player();
+	HitChecker* hitchecker = new HitChecker();
 
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	LONGLONG frameTime = 0;
@@ -59,7 +62,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	bool debugPauseFlag = false;
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
-		
 		// フレーム開始時の時間を取得
 		int startTime = GetNowCount();
 		// ぼたんおしたら
@@ -86,7 +88,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				player->Load();
 				camera->Load();
 
-
 				//ゲーム状態変化
 				gameStatus = STATE_TITLE;
 			}
@@ -98,7 +99,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				ClearDrawScreen();
 
 				//描画
-				printf("start");
+				SetFontSize(40);
+				DrawFormatString(0, 0, Pallet::AliceBlue.GetHandle(), "title");
 
 				// ゲーム状態変化
 				if (CheckHitKey(KEY_INPUT_SPACE))
@@ -106,6 +108,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 					gameStatus = STATE_READY;
 				}
+
 			}
 			//チュートリアル画面
 			if (gameStatus == STATE_READY)
@@ -136,8 +139,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				// スカイドーム制御
 				dome->SkydomeUpdate();
 
-				//ステージ制御
-
+				//当たり判定制御
+				hitchecker->Update(*player);
 
 				//障害物制御
 
@@ -152,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				dome->SkydomeDraw();
 				stage->Draw();
 				player->Draw();
-				
+				hitchecker->circleDraw();
 
 			}
 			//ゲームオーバー演出
@@ -167,7 +170,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			//ゲームリザルト
 			if (gameStatus == STATE_GAMEOVER)
 			{
-
 				// 画面を初期化する
 				ClearDrawScreen();
 				//描画
@@ -181,6 +183,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				}
 			}
 		}
+
 		// 裏画面の内容を表画面に反映させる
 		ScreenFlip();
 

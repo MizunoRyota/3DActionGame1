@@ -9,7 +9,7 @@
 Camera::Camera()
     :Zoom  (0)
     ,Hight  (0)
-    ,TargetHight(1.0f)
+    ,TargetHight(1.3f)
     ,position  (VGet(0, 0, 0))
 {
     //‰œs0.1`1000‚Ü‚Å‚ğƒJƒƒ‰‚Ì•`‰æ”ÍˆÍ‚Æ‚·‚é
@@ -27,7 +27,7 @@ Camera::~Camera()
 void Camera::Load()
 {
     Hight = 1.5f;
-    Zoom = -3.0f;
+    Zoom = -5.0f;
     position = VGet(0, Hight, Zoom);
 }
 

@@ -1,5 +1,6 @@
 #include"DxLib.h"
 #include"EffekseerForDXLib.h"
+#include"math.h"
 #include"Pallet.h"
 #include"Player.h"
 #include"Input.h"
@@ -9,8 +10,10 @@ Player::Player()
 	:position(VGet(0.0f, 0.0f, 0.0f))
 	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
-	,PlayerHandle(-1)
-	,currentState(State::Stand)
+	, PlayerHandle(-1)
+	,isAttack(false)
+	, currentState(State::Stand)
+	, currentAttack(AttackAnimKind::UnKown)
 	, ShadowRad(0.3f)
 	, playTime(0)
 	, prevPlayAnim(-1)
@@ -54,25 +57,16 @@ void Player::Load()
 void Player::Update(const Input& input)
 {
 
-	// ゲーム状態変化
-	if (CheckHitKey(KEY_INPUT_SPACE))
-	{
-		//モーションの変更
-		ChangeMotion(AnimKind::LastAttack);
-	}
-	if (CheckHitKey(KEY_INPUT_W))
-	{
-		//モーションの変更
-		ChangeMotion(AnimKind::FirstAttack);
-	}	
-	if (CheckHitKey(KEY_INPUT_R))
-	{
-		//モーションの変更
-		ChangeMotion(AnimKind::SecondAttack);
-	}
 	// パッド入力によって移動パラメータを設定する
 	VECTOR moveVec;			// このフレームの移動ベクトル
 	State prevState = currentState;
+	AttackAnimKind atttackAnim=currentAttack;
+
+	// ゲーム状態変化
+	if (CheckHitKey(KEY_INPUT_SPACE))
+	{
+		currentAttack=UpdateAnimationAttack(atttackAnim);	//プレイヤーの行動アニメーションの更新
+	}
 
 	currentState = UpdateMoveParameterWithPad(input, moveVec);
 
@@ -82,23 +76,85 @@ void Player::Update(const Input& input)
 		//printfDx("%f\n", position.x);
 		//printfDx("%f\n", position.y);
 		//printfDx("%f\n", position.z);
-		printfDx("%d",prevState);
-		printfDx("%d\n", currentState);
+		//printfDx("%d",prevState);
+		//printfDx("%d\n", currentState);
+		//printfDx("%d\n", PlayAnim);
+		printfDx("%d\n", currentAttack);
+
 	}
+	printfDx("%d\n", isAttack);
 	// アニメーションステートの更新
 	UpdateAnimationState(prevState);
 
-	//影の更新
-	UpdateShadow();
+	//プレイヤーが向く角度の更新
+	UpdateAngle();
 
 	//ポジションの更新
 	Move(moveVec);
 
+	//影の更新
+	UpdateShadow();
+
 	//アニメーション処理
 	UpdateAnimation();
+}
 
+void Player::ChangeAttackMotion(AttackAnimKind prevAnimKind)
+{
+	// 入れ替えを行うので、１つ前のモーションがが有効だったらデタッチする
+	if (prevPlayAnim != -1)
+	{
+		isAttack = false;
+		//アニメーションのデタッチ
+		MV1DetachAnim(PlayerHandle, prevPlayAnim);
+		prevPlayAnim = -1;
+	}
+	// 今まで再生中のモーションだったものの情報をPrevに移動する
+	prevPlayAnim = PlayAnim;
+	prevPlayTime = playTime;
+
+	//新しいアタッチ番号を保存
+	PlayAnim = MV1AttachAnim(PlayerHandle, static_cast<int>(prevAnimKind));
+
+	// 再生時間の初期化
+	playTime = 0;
+
+	// ブレンド率はPrevが有効ではない場合は１．０ｆ( 現在モーションが１００％の状態 )にする
+	animBlendRate = prevPlayAnim == -1 ? 1.0f : 0.0f;
+}
+
+Player::AttackAnimKind Player::UpdateAnimationAttack(AttackAnimKind prevAnimKind)
+{	 
+	AttackAnimKind nextAttack=prevAnimKind;
+
+	// 立ち止まりから攻撃に変わったら
+	if (prevAnimKind == AttackAnimKind::UnKown && currentState == State::Stand&&!isAttack)
+	{
+		// 初撃アニメーションを再生する
+		ChangeAttackMotion(AttackAnimKind::FirstAttack);
+		nextAttack = AttackAnimKind::FirstAttack;
+		isAttack = true;
+	}
+	if (prevAnimKind == AttackAnimKind::FirstAttack && currentState == State::Stand&&!isAttack)
+	{
+		// 2撃目アニメーションを再生する
+		ChangeAttackMotion(AttackAnimKind::SecondAttack);
+		nextAttack = AttackAnimKind::SecondAttack;
+		isAttack = true;
+
+	}
+	if (prevAnimKind == AttackAnimKind::SecondAttack && currentState == State::Stand&&!isAttack)
+	{
+		// 3撃目アニメーションを再生する
+		ChangeAttackMotion(AttackAnimKind::LastAttack);
+		nextAttack = AttackAnimKind::UnKown;
+		isAttack = true;
+	}
+
+	return nextAttack;
 
 }
+
 /// <summary>
 /// アニメーションの変更
 /// </summary>
@@ -157,6 +213,7 @@ void Player::UpdateAnimation()
 		// 再生時間がアニメーションの総再生時間に達したら再生時間を０に戻す
 		if (playTime >= animTotalTime)
 		{
+
 			playTime = static_cast<float>(fmod(playTime, animTotalTime));
 		}
 
@@ -177,7 +234,12 @@ void Player::UpdateAnimation()
 		// 再生時間が総時間に到達していたら再生時間をループさせる
 		if (prevPlayTime > animTotalTime)
 		{
-			prevPlayTime = static_cast<float>(fmod(prevPlayTime, animTotalTime));
+			if (!isAttack)
+			{
+				prevPlayTime = static_cast<float>(fmod(prevPlayTime, animTotalTime));
+
+			}
+			isAttack = false;
 		}
 
 		// 変更した再生時間をモデルに反映させる
@@ -196,7 +258,6 @@ void Player::UpdateShadow()
 	shadowToppos = VGet(position.x, -0.1, position.z);
 	shadowBottompos = VGet(position.x, position.y, position.z);
 }
-
 
 Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& moveVec)
 {
@@ -225,7 +286,7 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 		// 移動したかどうかのフラグを「移動した」にする
 		isMoveStick = true;
 	}
-	else if (input.GetNowFrameInput() & PAD_INPUT_UP)
+	if (input.GetNowFrameInput() & PAD_INPUT_UP)
 	{
 		// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
 		moveVec = VAdd(moveVec, VGet(0, 0, 1));
@@ -245,6 +306,7 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 	// 移動ボタンが押されたかどうかで処理を分岐
 	if (isMoveStick)
 	{
+
 		// もし今まで「立ち止まり」状態だったら
 		if (currentState == State::Stand)
 		{
@@ -273,6 +335,18 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 }
 
+void Player::UpdateAngle()
+{
+
+	float Angle;
+
+	Angle = static_cast<float>(atan2(targetMoveDirection.x * -1, targetMoveDirection.z*-1));
+
+	// ３ＤモデルのY軸の回転値を９０度にセットする
+	MV1SetRotationXYZ(PlayerHandle, VGet(0.0f, Angle, 0.0f));
+
+}
+
  void Player::UpdateAnimationState(State prevState)
  {
 	 // 立ち止まりから走りに変わったら
@@ -287,7 +361,6 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 		 // 立ち止りアニメーションを再生する
 		 ChangeMotion(AnimKind::Idol);
 	 }
-
  }
 
  void Player::Move( VECTOR& moveVec)

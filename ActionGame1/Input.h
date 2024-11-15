@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 /// <summary>
 /// “ü—Í
