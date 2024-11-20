@@ -103,7 +103,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				DrawFormatString(0, 0, Pallet::AliceBlue.GetHandle(), "title");
 
 				// ÉQÅ[ÉÄèÛë‘ïœâª
-				if (CheckHitKey(KEY_INPUT_SPACE))
+				if (CheckHitKey(KEY_INPUT_RETURN))
 				{
 
 					gameStatus = STATE_READY;

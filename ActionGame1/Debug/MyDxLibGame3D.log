@@ -1,3 +1,7 @@
-﻿  Player.cpp
-D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Player.cpp(258,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+﻿  Camera.cpp
+  HitChecker.cpp
+  Player.cpp
+D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Player.cpp(275,34): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+  main.cpp
+  コードを生成中...
   MyDxLibGame3D.vcxproj -> D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Debug\MyDxLibGame3D.exe

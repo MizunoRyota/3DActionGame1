@@ -5,15 +5,17 @@
 #include"Player.h"
 #include"Input.h"
 
-
 Player::Player()
 	:position(VGet(0.0f, 0.0f, 0.0f))
 	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
 	, PlayerHandle(-1)
 	,isAttack(false)
+	,isFirstAttack(false)
+	,isSecondAttack(false)
+	,isThirdAttack(false)
 	, currentState(State::Stand)
-	, currentAttack(AttackAnimKind::UnKown)
+	//, currentAttack(AttackAnimKind::UnKown)
 	, ShadowRad(0.3f)
 	, playTime(0)
 	, prevPlayAnim(-1)
@@ -60,15 +62,10 @@ void Player::Update(const Input& input)
 	// パッド入力によって移動パラメータを設定する
 	VECTOR moveVec;			// このフレームの移動ベクトル
 	State prevState = currentState;
-	AttackAnimKind atttackAnim=currentAttack;
-
+	//AttackAnimKind atttackAnim=currentAttack;
 	// ゲーム状態変化
-	if (CheckHitKey(KEY_INPUT_SPACE))
-	{
-		currentAttack=UpdateAnimationAttack(atttackAnim);	//プレイヤーの行動アニメーションの更新
-	}
 
-	currentState = UpdateMoveParameterWithPad(input, moveVec);
+     	currentState = UpdateMoveParameterWithPad(input, moveVec);
 
 	// ぼたんおしたら
 	if (CheckHitKey(KEY_INPUT_G))
@@ -76,15 +73,23 @@ void Player::Update(const Input& input)
 		//printfDx("%f\n", position.x);
 		//printfDx("%f\n", position.y);
 		//printfDx("%f\n", position.z);
-		//printfDx("%d",prevState);
-		//printfDx("%d\n", currentState);
+		printfDx("currentState%d\n", currentState);
+		printfDx("prevState%d",prevState);
 		//printfDx("%d\n", PlayAnim);
-		printfDx("%d\n", currentAttack);
-
+		//printfDx("%d\n", currentAttack);
+		//printfDx("%d\n", isAttack);
 	}
-	printfDx("%d\n", isAttack);
 	// アニメーションステートの更新
-	UpdateAnimationState(prevState);
+	if (CheckHitKey(KEY_INPUT_SPACE))
+	{
+ 		UpdateAttack();
+		UpdateAttackState(prevState);
+		//currentAttack=UpdateAnimationAttack(atttackAnim);	//プレイヤーの行動アニメーションの更新
+	}
+	else
+	{
+		UpdateAnimationState(prevState);
+	}
 
 	//プレイヤーが向く角度の更新
 	UpdateAngle();
@@ -99,61 +104,78 @@ void Player::Update(const Input& input)
 	UpdateAnimation();
 }
 
-void Player::ChangeAttackMotion(AttackAnimKind prevAnimKind)
+void Player::UpdateAttack()
 {
-	// 入れ替えを行うので、１つ前のモーションがが有効だったらデタッチする
-	if (prevPlayAnim != -1)
+	if (!isFirstAttack)
 	{
-		isAttack = false;
-		//アニメーションのデタッチ
-		MV1DetachAnim(PlayerHandle, prevPlayAnim);
-		prevPlayAnim = -1;
+		currentState = State::FirstAttack;
 	}
-	// 今まで再生中のモーションだったものの情報をPrevに移動する
-	prevPlayAnim = PlayAnim;
-	prevPlayTime = playTime;
+	else if (!isSecondAttack)
+	{
+		currentState = State::SecondAttack;
+	}
+	else if(isFirstAttack&& isSecondAttack)
+	{
+		currentState = State::LastAttack;
+	}
 
-	//新しいアタッチ番号を保存
-	PlayAnim = MV1AttachAnim(PlayerHandle, static_cast<int>(prevAnimKind));
-
-	// 再生時間の初期化
-	playTime = 0;
-
-	// ブレンド率はPrevが有効ではない場合は１．０ｆ( 現在モーションが１００％の状態 )にする
-	animBlendRate = prevPlayAnim == -1 ? 1.0f : 0.0f;
 }
 
-Player::AttackAnimKind Player::UpdateAnimationAttack(AttackAnimKind prevAnimKind)
-{	 
-	AttackAnimKind nextAttack=prevAnimKind;
+//void Player::ChangeAttackMotion(AttackAnimKind prevAnimKind)
+//{
+//	// 入れ替えを行うので、１つ前のモーションがが有効だったらデタッチする
+//	if (prevPlayAnim != -1)
+//	{
+//		isAttack = false;
+//		//アニメーションのデタッチ
+//		MV1DetachAnim(PlayerHandle, prevPlayAnim);
+//		prevPlayAnim = -1;
+//	}
+//	// 今まで再生中のモーションだったものの情報をPrevに移動する
+//	prevPlayAnim = PlayAnim;
+//	prevPlayTime = playTime;
+//
+//	//新しいアタッチ番号を保存
+//	PlayAnim = MV1AttachAnim(PlayerHandle, static_cast<int>(prevAnimKind));
+//
+//	// 再生時間の初期化
+//	playTime = 0;
+//
+//	// ブレンド率はPrevが有効ではない場合は１．０ｆ( 現在モーションが１００％の状態 )にする
+//	animBlendRate = prevPlayAnim == -1 ? 1.0f : 0.0f;
+//}
 
-	// 立ち止まりから攻撃に変わったら
-	if (prevAnimKind == AttackAnimKind::UnKown && currentState == State::Stand&&!isAttack)
-	{
-		// 初撃アニメーションを再生する
-		ChangeAttackMotion(AttackAnimKind::FirstAttack);
-		nextAttack = AttackAnimKind::FirstAttack;
-		isAttack = true;
-	}
-	if (prevAnimKind == AttackAnimKind::FirstAttack && currentState == State::Stand&&!isAttack)
-	{
-		// 2撃目アニメーションを再生する
-		ChangeAttackMotion(AttackAnimKind::SecondAttack);
-		nextAttack = AttackAnimKind::SecondAttack;
-		isAttack = true;
-
-	}
-	if (prevAnimKind == AttackAnimKind::SecondAttack && currentState == State::Stand&&!isAttack)
-	{
-		// 3撃目アニメーションを再生する
-		ChangeAttackMotion(AttackAnimKind::LastAttack);
-		nextAttack = AttackAnimKind::UnKown;
-		isAttack = true;
-	}
-
-	return nextAttack;
-
-}
+//Player::AttackAnimKind Player::UpdateAnimationAttack(AttackAnimKind prevAnimKind)
+//{	 
+//	AttackAnimKind nextAttack=prevAnimKind;
+//
+//	// 立ち止まりから攻撃に変わったら
+//	if (prevAnimKind == AttackAnimKind::UnKown && currentState == State::Stand&&!isAttack)
+//	{
+//		// 初撃アニメーションを再生する
+//		ChangeAttackMotion(AttackAnimKind::FirstAttack);
+//		nextAttack = AttackAnimKind::FirstAttack;
+//		isAttack = true;
+//	}
+//	if (prevAnimKind == AttackAnimKind::FirstAttack && currentState == State::Stand&&!isAttack)
+//	{
+//		// 2撃目アニメーションを再生する
+//		ChangeAttackMotion(AttackAnimKind::SecondAttack);
+//		nextAttack = AttackAnimKind::SecondAttack;
+//		isAttack = true;
+//
+//	}
+//	if (prevAnimKind == AttackAnimKind::SecondAttack && currentState == State::Stand&&!isAttack)
+//	{
+//		// 3撃目アニメーションを再生する
+//		ChangeAttackMotion(AttackAnimKind::LastAttack);
+//		nextAttack = AttackAnimKind::UnKown;
+//		isAttack = true;
+//	}
+//
+//	return nextAttack;
+//
+//}
 
 /// <summary>
 /// アニメーションの変更
@@ -213,7 +235,7 @@ void Player::UpdateAnimation()
 		// 再生時間がアニメーションの総再生時間に達したら再生時間を０に戻す
 		if (playTime >= animTotalTime)
 		{
-
+			isAttack=false;
 			playTime = static_cast<float>(fmod(playTime, animTotalTime));
 		}
 
@@ -234,12 +256,7 @@ void Player::UpdateAnimation()
 		// 再生時間が総時間に到達していたら再生時間をループさせる
 		if (prevPlayTime > animTotalTime)
 		{
-			if (!isAttack)
-			{
 				prevPlayTime = static_cast<float>(fmod(prevPlayTime, animTotalTime));
-
-			}
-			isAttack = false;
 		}
 
 		// 変更した再生時間をモデルに反映させる
@@ -277,6 +294,11 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 		// 移動したかどうかのフラグを「移動した」にする
 		isMoveStick = true;
+
+		//
+		isAttack = false;
+		isFirstAttack = false;
+		isSecondAttack = false;
 	}
 	else if (input.GetNowFrameInput() & PAD_INPUT_RIGHT)
 	{
@@ -285,6 +307,11 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 		// 移動したかどうかのフラグを「移動した」にする
 		isMoveStick = true;
+
+		//
+		isAttack = false;
+		isFirstAttack = false;
+		isSecondAttack = false;
 	}
 	if (input.GetNowFrameInput() & PAD_INPUT_UP)
 	{
@@ -293,6 +320,11 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 		// 移動したかどうかのフラグを「移動した」にする
 		isMoveStick = true;
+
+		isAttack = false;
+		isFirstAttack = false;
+		isSecondAttack = false;
+
 	}
 	else if (input.GetNowFrameInput() & PAD_INPUT_DOWN)
 	{
@@ -301,6 +333,11 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 		// 移動したかどうかのフラグを「移動した」にする
 		isMoveStick = true;
+
+
+		isAttack = false;
+		isFirstAttack = false;
+		isSecondAttack = false;
 	}
 
 	// 移動ボタンが押されたかどうかで処理を分岐
@@ -329,6 +366,11 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 			// 状態を「立ち止り」にする
 			nextState = State::Stand;
 		}
+ 		else if (currentState == State::FirstAttack|| currentState == State::SecondAttack|| currentState == State::LastAttack && !isAttack)
+		{
+			// 状態を「立ち止り」にする
+			nextState = State::Stand;
+		}
 	}
 
 	return nextState;
@@ -347,22 +389,53 @@ void Player::UpdateAngle()
 
 }
 
- void Player::UpdateAnimationState(State prevState)
+void Player::UpdateAnimationState(State prevState)
+{
+	// 立ち止まりから走りに変わったら
+	if (prevState == State::Stand && currentState == State::Run)
+	{
+		// 走りアニメーションを再生する
+		ChangeMotion(AnimKind::Run);
+	}
+	// 走りから立ち止まりに変わったら
+	if (prevState == State::Run && currentState == State::Stand)
+	{
+		// 立ち止りアニメーションを再生する
+		ChangeMotion(AnimKind::Idol);
+	}
+	else if (currentState == State::FirstAttack || currentState == State::SecondAttack || currentState == State::LastAttack && currentState == State::Stand && !isAttack)
+	{
+		// 立ち止りアニメーションを再生する
+		ChangeMotion(AnimKind::Idol);
+	}
+}
+
+ void Player::UpdateAttackState(State prevState)
  {
 	 // 立ち止まりから走りに変わったら
-	 if (prevState == State::Stand && currentState == State::Run)
+	 if (prevState == State::Stand && currentState == State::FirstAttack&&!isFirstAttack&&!isAttack)
 	 {
 		 // 走りアニメーションを再生する
-		 ChangeMotion(AnimKind::Run);
+  		 ChangeMotion(AnimKind::FirstAttack);
+		 isFirstAttack = true;
+		 isAttack = true;
 	 }
-	 // 走りから立ち止まりに変わったら
-	 else if (prevState == State::Run && currentState == State::Stand)
+	 else if (prevState == State::Stand && currentState == State::SecondAttack && !isSecondAttack&&isFirstAttack && !isAttack)
 	 {
-		 // 立ち止りアニメーションを再生する
-		 ChangeMotion(AnimKind::Idol);
+		 // 走りアニメーションを再生する
+		 ChangeMotion(AnimKind::SecondAttack);
+		 isSecondAttack = true;
+		 isAttack = true;
+	 }
+	 else if (prevState == State::Stand && currentState == State::LastAttack && isFirstAttack&&isSecondAttack && !isAttack)
+	 {
+		 // 走りアニメーションを再生する
+		 ChangeMotion(AnimKind::LastAttack);
+		 isFirstAttack = false;
+		 isSecondAttack = false;
+		 isAttack = true;
 	 }
  }
-
  void Player::Move( VECTOR& moveVec)
  {
 

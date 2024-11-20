@@ -10,11 +10,19 @@ public:
 	{
 		Stand = 0,		// 立ち止まり
 		Run = 1,		// 走り
+		FinishAttack = 2,		// とどめの一撃
+		FirstAttack = 3,		// 最初の攻撃
+		SecondAttack = 4,		// 2段目の攻撃
+		LastAttack = 5,			// 最後の攻撃
 	};
 	enum class AnimKind : int
 	{
 		None = -1,		// なし
 		Unkown = 0,	// 不明
+		FinishAttack = 1,		// とどめの一撃
+		FirstAttack = 2,		// 最初の攻撃
+		SecondAttack = 3,		// 2段目の攻撃
+		LastAttack = 4,			// 最後の攻撃
 		Squat = 5,				//しゃがむ
 		Roll = 6,				//ローリング
 		Idol = 7,				//立ち止まり
@@ -64,29 +72,43 @@ private:
 	VECTOR targetMoveDirection;			// モデルが向くべき方向のベクトル
 	int PlayerHandle;					// プレイヤーのモデルハンドル
 	bool isAttack;
+
+	//プレイヤーの攻撃に関するメンバ変数
+	bool isFirstAttack;
+	bool isSecondAttack;
+	bool isThirdAttack;
+
 	//アニメーションに関するメンバ変数
 	State currentState;				//現在のアニメーションの状態
 	AttackAnimKind currentAttack;	//現在の攻撃アニメーションの状態
-	float playTime;				//アニメーションの時間の合計
-	int PlayAnim;				//現在のアニメーションアタッチ番号
-	int AttachIndex;			//アニメーションを付与される変数
-	float AnimTime;				//アニメーションを進める変数
+	float playTime;					//アニメーションの時間の合計
+	int PlayAnim;					//現在のアニメーションアタッチ番号
+	int AttachIndex;				//アニメーションを付与される変数
+	float AnimTime;					//アニメーションを進める変数
 
-	int prevPlayAnim;			//前のアニメーションアタッチ番号
-	float prevPlayTime;			//前のアニメーションの時間の合計
+	int prevPlayAnim;				//前のアニメーションアタッチ番号
+	float prevPlayTime;				//前のアニメーションの時間の合計
 	
-	float animBlendRate;		//過去と現在のアニメーションのブレンド率
+	float animBlendRate;			//過去と現在のアニメーションのブレンド率
 
 	//プレイヤーの影
-	VECTOR shadowToppos;		//影の頂点
-	VECTOR shadowBottompos;		//影の底辺
-	float ShadowRad;			//影の半径
+	VECTOR shadowToppos;			//影の頂点
+	VECTOR shadowBottompos;			//影の底辺
+	float ShadowRad;				//影の半径
 
 	void ChangeMotion(AnimKind  motionNum);					//モーション変更
-	void ChangeAttackMotion(AttackAnimKind prevAnimKind);
 	void UpdateAnimation();									//Playerのアニメーション更新
-	void UpdateAnimationState(State prevState);				// アニメーションステートの更新
-	AttackAnimKind UpdateAnimationAttack(AttackAnimKind prevAnimKind);	//プレイヤーの行動アニメーションの更新
+	void UpdateAnimationState(State prevState);		
+	void UpdateAttackState(State prevState);
+	void UpdateAttack();
+	
+	
 
 
+
+
+
+	// アニメーションステートの更新
+	/*void ChangeAttackMotion(AttackAnimKind prevAnimKind);*/
+	//AttackAnimKind UpdateAnimationAttack(AttackAnimKind prevAnimKind);	//プレイヤーの行動アニメーションの更新
 };

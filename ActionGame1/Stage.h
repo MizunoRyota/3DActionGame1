@@ -9,7 +9,7 @@ public:
 	void Draw();	//描画
 
 private:
-	static constexpr float Scale = 0.008f;		//大きさ
+	static constexpr float Scale = 0.01f;		//大きさ
 	VECTOR position;	//ポジション.
 	int StageHandle;	//3Dモデルハンドル
 
