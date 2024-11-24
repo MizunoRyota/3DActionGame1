@@ -9,6 +9,7 @@ Player::Player()
 	:position(VGet(0.0f, 0.0f, 0.0f))
 	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
+	, returnRange(30.0f)
 	, PlayerHandle(-1)
 	,isAttack(false)
 	,isFirstAttack(false)
@@ -51,7 +52,7 @@ void Player::Load()
 	playTime = 0.0f;
 	
 	// ３ＤモデルのY軸の回転値を９０度にセットする
-	MV1SetRotationXYZ(PlayerHandle, VGet(0.0f, 180.0f * DX_PI_F / 180.0f, 0.0f));
+	MV1SetRotationXYZ(PlayerHandle, VGet(0.0f, 90.0f * DX_PI_F / 180.0f, 0.0f));
 }
 /// <summary>
 /// 更新
@@ -70,14 +71,15 @@ void Player::Update(const Input& input)
 	// ぼたんおしたら
 	if (CheckHitKey(KEY_INPUT_G))
 	{
-		//printfDx("%f\n", position.x);
-		//printfDx("%f\n", position.y);
-		//printfDx("%f\n", position.z);
+		clsDx();
+		printfDx("xpos%f\n", position.x);
+		printfDx("ypos%f\n", position.y);
+		printfDx("zpos%f\n", position.z);
 		printfDx("currentState%d\n", currentState);
-		printfDx("prevState%d",prevState);
-		//printfDx("%d\n", PlayAnim);
-		//printfDx("%d\n", currentAttack);
-		//printfDx("%d\n", isAttack);
+		printfDx("prevState%d\n",prevState);
+		printfDx("PlayAnim%d\n", PlayAnim);
+		printfDx("currentAttack%d\n", currentAttack);
+		printfDx("isAttack%d\n", isAttack);
 	}
 	// アニメーションステートの更新
 	if (CheckHitKey(KEY_INPUT_SPACE))
@@ -89,6 +91,32 @@ void Player::Update(const Input& input)
 	else
 	{
 		UpdateAnimationState(prevState);
+	}
+
+	////中心からプレイヤーの距離を測る
+
+	float r = VSize(VSub(position, VGet(0, 0, 0)));
+
+	////一定の距離に達したらそれ以上いけないようにする
+
+	if (r >= returnRange || r <= -returnRange)
+
+	{
+
+		//中心座標からプレイヤー座標の距離
+
+		VECTOR distance = VSub(VGet(0, 0, 0), position);
+
+		//正規化
+
+		distance = VNorm(distance);
+
+		//戻す量を計算、加算する
+
+		VECTOR returnPosition = VScale(distance, (r - returnRange));
+
+		position = VAdd(position, returnPosition);
+
 	}
 
 	//プレイヤーが向く角度の更新
@@ -377,6 +405,9 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 }
 
+/// <summary>
+/// 角度の更新処理
+/// </summary>
 void Player::UpdateAngle()
 {
 
@@ -389,6 +420,9 @@ void Player::UpdateAngle()
 
 }
 
+/// <summary>
+/// アニメーションの更新処理
+/// </summary>
 void Player::UpdateAnimationState(State prevState)
 {
 	// 立ち止まりから走りに変わったら

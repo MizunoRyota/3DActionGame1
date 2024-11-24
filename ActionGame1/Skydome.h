@@ -14,5 +14,6 @@ private:
 	VECTOR	dir;			// ‰ñ“]•ûŒü.
 	int Key;
 	// Ã“I’è”.
-	static const float Scale;
+	static constexpr float Scale = 1.0f;		//‘å‚«‚³
+
 };

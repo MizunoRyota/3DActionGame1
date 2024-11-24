@@ -5,6 +5,7 @@
 #include"Stage.h"
 #include"Input.h"
 #include"Camera.h"
+#include"Enemy.h"
 #include"Player.h"
 #include"HitChecker.h"
 enum STATE
@@ -52,6 +53,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Stage* stage = new Stage();
 	Input* input = new Input();
 	Camera* camera = new Camera();
+    Enemy* enemy = new Enemy();
 	Player* player = new Player();
 	HitChecker* hitchecker = new HitChecker();
 
@@ -85,6 +87,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			if (gameStatus == STATE_INIT)
 			{
 				stage->Load();
+				enemy->Load();
 				player->Load();
 				camera->Load();
 
@@ -133,6 +136,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				//パッドの制御
 				input->Update();
 				// プレイヤー制御
+				enemy->Update(*player);
 				player->Update(*input);
 				// カメラの制御
 				camera->Update(*player);
@@ -154,6 +158,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				// 描画
 				dome->SkydomeDraw();
 				stage->Draw();
+				enemy->Draw();
 				player->Draw();
 				hitchecker->circleDraw();
 

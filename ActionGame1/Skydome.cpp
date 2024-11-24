@@ -1,13 +1,12 @@
 #include"DxLib.h"
 #include"skydome.h"
-
-const float Skydome::Scale = 1.5f;		// スケール
-
 Skydome::Skydome()
 {
     // ３Ｄモデルの読み込み
     SkydomeHandle = MV1LoadModel("data/model/Skydome/Sunny/Dome_X501.pmx");
-    pos = VGet(0, 0, 0);
+    pos = VGet(0, 0, -50);
+    // プレイヤーのモデルの座標を更新する
+    MV1SetPosition(SkydomeHandle, pos);
     // 3Dモデルのスケール決定
     MV1SetScale(SkydomeHandle, VGet(Scale, Scale, Scale));
 }

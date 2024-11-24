@@ -13,7 +13,7 @@ Camera::Camera()
     ,position  (VGet(0, 0, 0))
 {
     //‰œs0.1`1000‚Ü‚Å‚ğƒJƒƒ‰‚Ì•`‰æ”ÍˆÍ‚Æ‚·‚é
-    SetCameraNearFar(0.1f, 10000.0f);
+    SetCameraNearFar(1.0f, 1000.0f);
 }
 
 /// <summary>
