@@ -8,6 +8,7 @@
 #include"Enemy.h"
 #include"Player.h"
 #include"HitChecker.h"
+#include"EnemyAttackRangeChecker.h"
 enum STATE
 {
 	STATE_INIT,
@@ -19,20 +20,40 @@ enum STATE
 	STATE_GAMEOVER,		// ゲームオーバー.
 };
 
+const int HITCHECK_NUM = 2;
+
 /// <summary>
 /// メイン関数
 /// </summary>
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	// ＤＸライブラリ初期化処理
-	if (DxLib_Init() == -1)
-	{
-		return -1;	// エラーが起きたら直ちに終了
-	}
-
 	// 画面モードのセット
 	ChangeWindowMode(TRUE);
-	SetGraphMode(800, 600, 16);
+	SetGraphMode(1400, 800, 16);
+
+	// DXライブラリを初期化する。
+	if (DxLib_Init() == -1) return -1;
+
+	// Effekseerを初期化する。
+	// 引数には画面に表示する最大パーティクル数を設定する。
+	if (Effkseer_Init(8000) == -1)
+	{
+		DxLib_End();
+		return -1;
+	}
+
+	// DirectX9を使用するようにする。(DirectX11も可)
+// Effekseerを使用するには必ず設定する。
+	SetUseDirect3DVersion(DX_DIRECT3D_11);
+
+	// フルスクリーンウインドウの切り替えでリソースが消えるのを防ぐ。
+// Effekseerを使用する場合は必ず設定する。
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
+
+	// DXライブラリのデバイスロストした時のコールバックを設定する。
+	// ウインドウとフルスクリーンの切り替えが発生する場合は必ず実行する。
+	// ただし、DirectX11を使用する場合は実行する必要はない。
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 
 	SetDrawScreen(DX_SCREEN_BACK);	// 裏画面を描画対象にする
 	SetUseZBufferFlag(TRUE);		// Ｚバッファを使用する
@@ -55,8 +76,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Camera* camera = new Camera();
     Enemy* enemy = new Enemy();
 	Player* player = new Player();
-	HitChecker* hitchecker = new HitChecker();
-
+	HitChecker* hitchecker[HITCHECK_NUM];
+	hitchecker[0] = new HitChecker();
+	hitchecker[1] = new EnemyAttackRangeChecker();
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	LONGLONG frameTime = 0;
 
@@ -108,7 +130,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				// ゲーム状態変化
 				if (CheckHitKey(KEY_INPUT_RETURN))
 				{
-
 					gameStatus = STATE_READY;
 				}
 
@@ -132,7 +153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			{
 
 				//ゲームシーンの制御
-
+				stage->Update();
 				//パッドの制御
 				input->Update();
 				// プレイヤー制御
@@ -144,13 +165,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				dome->SkydomeUpdate();
 
 				//当たり判定制御
-				hitchecker->Update(*player);
-
-				//障害物制御
-
-
-				//コイン制御
-
+				for (int i = 0; i < HITCHECK_NUM; i++)
+				{
+					hitchecker[i]->Update(*player, *enemy);
+				}
 
 				// 画面を初期化する
 				ClearDrawScreen();
@@ -160,8 +178,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				stage->Draw();
 				enemy->Draw();
 				player->Draw();
-				hitchecker->circleDraw();
-
+				for (int i = 0; i < HITCHECK_NUM; i++)
+				{
+					hitchecker[i]->DrawCircle();
+				}
 			}
 			//ゲームオーバー演出
 			if (gameStatus == STATE_END)
@@ -206,6 +226,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 	}
 
+
+	// Effekseerを終了する。
+	Effkseer_End();
 	// 後始末
 	// ＤＸライブラリの後始末
 	DxLib_End();

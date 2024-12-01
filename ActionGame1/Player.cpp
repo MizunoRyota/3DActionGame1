@@ -11,6 +11,8 @@ Player::Player()
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
 	, returnRange(30.0f)
 	, PlayerHandle(-1)
+	, angle(0.0f)
+
 	,isAttack(false)
 	,isFirstAttack(false)
 	,isSecondAttack(false)
@@ -93,6 +95,23 @@ void Player::Update(const Input& input)
 		UpdateAnimationState(prevState);
 	}
 
+	LimitRange();
+
+	//プレイヤーが向く角度の更新
+	UpdateAngle();
+
+	//ポジションの更新
+	Move(moveVec);
+
+	//影の更新
+	UpdateShadow();
+
+	//アニメーション処理
+	UpdateAnimation();
+}
+
+void Player::LimitRange()
+{
 	////中心からプレイヤーの距離を測る
 
 	float r = VSize(VSub(position, VGet(0, 0, 0)));
@@ -118,18 +137,6 @@ void Player::Update(const Input& input)
 		position = VAdd(position, returnPosition);
 
 	}
-
-	//プレイヤーが向く角度の更新
-	UpdateAngle();
-
-	//ポジションの更新
-	Move(moveVec);
-
-	//影の更新
-	UpdateShadow();
-
-	//アニメーション処理
-	UpdateAnimation();
 }
 
 void Player::UpdateAttack()
@@ -410,15 +417,53 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 /// </summary>
 void Player::UpdateAngle()
 {
+	// プレイヤーの移動方向にモデルの方向を近づける
+	float targetAngle;			// 目標角度
+	float difference;			// 目標角度と現在の角度との差
 
-	float Angle;
+	// 目標の方向ベクトルから角度値を算出する
+	targetAngle = static_cast<float>(atan2(targetMoveDirection.x, targetMoveDirection.z));
 
-	Angle = static_cast<float>(atan2(targetMoveDirection.x * -1, targetMoveDirection.z*-1));
+	// 目標の角度と現在の角度との差を割り出す
+	// 最初は単純に引き算
+	difference = targetAngle - angle;
 
-	// ３ＤモデルのY軸の回転値を９０度にセットする
-	MV1SetRotationXYZ(PlayerHandle, VGet(0.0f, Angle, 0.0f));
+	// ある方向からある方向の差が１８０度以上になることは無いので
+	// 差の値が１８０度以上になっていたら修正する
+	if (difference < -DX_PI_F)
+	{
+		difference += DX_TWO_PI_F;
+	}
+	else if (difference > DX_PI_F)
+	{
+		difference -= DX_TWO_PI_F;
+	}
 
+	// 角度の差が０に近づける
+	if (difference > 0.0f)
+	{
+		// 差がプラスの場合は引く
+		difference -= AngleSpeed;
+		if (difference < 0.0f)
+		{
+			difference = 0.0f;
+		}
+	}
+	else
+	{
+		// 差がマイナスの場合は足す
+		difference += AngleSpeed;
+		if (difference > 0.0f)
+		{
+			difference = 0.0f;
+		}
+	}
+
+	// モデルの角度を更新
+	angle = targetAngle - difference;
+	MV1SetRotationXYZ(PlayerHandle, VGet(0.0f, angle + DX_PI_F, 0.0f));
 }
+
 
 /// <summary>
 /// アニメーションの更新処理
@@ -470,6 +515,7 @@ void Player::UpdateAnimationState(State prevState)
 		 isAttack = true;
 	 }
  }
+
  void Player::Move( VECTOR& moveVec)
  {
 

@@ -15,4 +15,7 @@ namespace Pallet
     inline constexpr Color Darkyan{ 0,139,139 };
 
     inline constexpr Color LemonYellow{ 255,244,80 };
+
+
+
 }

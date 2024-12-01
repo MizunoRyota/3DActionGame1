@@ -14,6 +14,9 @@
     <Filter Include="Character">
       <UniqueIdentifier>{e291136e-75ea-49e7-8a5f-1a32478df4a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HitChecks">
+      <UniqueIdentifier>{89ae011d-1916-40c3-abcd-092676c9d8c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp">
@@ -31,9 +34,6 @@
     <ClCompile Include="Skydome.cpp">
       <Filter>Environment</Filter>
     </ClCompile>
-    <ClCompile Include="HitChecker.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Character</Filter>
     </ClCompile>
@@ -45,6 +45,15 @@
     </ClCompile>
     <ClCompile Include="Stage.cpp">
       <Filter>Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="HitChecker.cpp">
+      <Filter>HitChecks</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackHitChecker.cpp">
+      <Filter>HitChecks</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAttackRangeChecker.cpp">
+      <Filter>HitChecks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -69,14 +78,20 @@
     <ClInclude Include="Skydome.h">
       <Filter>Environment</Filter>
     </ClInclude>
-    <ClInclude Include="HitChecker.h">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Character</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
       <Filter>Character</Filter>
+    </ClInclude>
+    <ClInclude Include="HitChecker.h">
+      <Filter>HitChecks</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackHitChecker.h">
+      <Filter>HitChecks</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyAttackRangeChecker.h">
+      <Filter>HitChecks</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

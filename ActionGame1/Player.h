@@ -47,6 +47,7 @@ public:
 	void Update(const Input& input);  //更新
 	State UpdateMoveParameterWithPad(const Input& input, VECTOR& moveVec);//パッドの入力更新
 	void UpdateAngle();
+	void LimitRange();
 	void Move(VECTOR& moveVec);
 	void Draw();	//描画
 
@@ -61,9 +62,10 @@ private:
 	//プレイヤー自身に関するメンバ静的定数
 	static constexpr float Scale = 0.006f;		//大きさ
 	//アニメーションに関するメンバ静的定数
-	static constexpr float playAnimSpeed = 0.7f;		//アニメーションを進める速度
+	static constexpr float playAnimSpeed = 1.5f;		//アニメーションを進める速度
 	static constexpr float AnimBlendSpeed = 0.1f;	// アニメーションのブレンド率変化速度
-	static constexpr float	MoveSpeed = 0.250f;		// 移動速度
+	static constexpr float	AngleSpeed = 0.6f;		// 角度変化速度
+	static constexpr float	MoveSpeed = 0.50f;		// 移動速度
 
 	//プレイヤー自身に関するメンバ変数
 	VECTOR	velocity;					// 移動力.
@@ -72,7 +74,8 @@ private:
 	VECTOR targetMoveDirection;			// モデルが向くべき方向のベクトル
 	int PlayerHandle;					// プレイヤーのモデルハンドル
 	bool isAttack;
-	float returnRange;		//最大移動距離
+	float returnRange;					//最大移動距離
+	float angle;				
 	//プレイヤーの攻撃に関するメンバ変数
 	bool isFirstAttack;
 	bool isSecondAttack;
@@ -85,10 +88,8 @@ private:
 	int PlayAnim;					//現在のアニメーションアタッチ番号
 	int AttachIndex;				//アニメーションを付与される変数
 	float AnimTime;					//アニメーションを進める変数
-
 	int prevPlayAnim;				//前のアニメーションアタッチ番号
 	float prevPlayTime;				//前のアニメーションの時間の合計
-
 	float animBlendRate;			//過去と現在のアニメーションのブレンド率
 
 	//プレイヤーの影
@@ -101,7 +102,7 @@ private:
 	void UpdateAnimationState(State prevState);
 	void UpdateAttackState(State prevState);
 	void UpdateAttack();
-
+	 
 
 
 
