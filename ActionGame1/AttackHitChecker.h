@@ -1,6 +1,6 @@
 #pragma once
-#include"HitChecker.h"
 
+class HitChecker;
 class  AttackHit : public HitChecker
 {
 public:

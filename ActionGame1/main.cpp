@@ -6,9 +6,10 @@
 #include"Input.h"
 #include"Camera.h"
 #include"Enemy.h"
-#include"Player.h"
 #include"HitChecker.h"
 #include"EnemyAttackRangeChecker.h"
+#include"Player.h"
+
 enum STATE
 {
 	STATE_INIT,
@@ -29,7 +30,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	// 画面モードのセット
 	ChangeWindowMode(TRUE);
-	SetGraphMode(1400, 800, 16);
+	SetGraphMode(1920, 1080, 32);
 
 	// DXライブラリを初期化する。
 	if (DxLib_Init() == -1) return -1;
@@ -76,9 +77,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Camera* camera = new Camera();
     Enemy* enemy = new Enemy();
 	Player* player = new Player();
-	HitChecker* hitchecker[HITCHECK_NUM];
+	HitChecker *hitchecker[HITCHECK_NUM];
 	hitchecker[0] = new HitChecker();
 	hitchecker[1] = new EnemyAttackRangeChecker();
+
 	// エスケープキーが押されるかウインドウが閉じられるまでループ
 	LONGLONG frameTime = 0;
 
@@ -156,19 +158,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 				stage->Update();
 				//パッドの制御
 				input->Update();
-				// プレイヤー制御
-				enemy->Update(*player);
-				player->Update(*input);
-				// カメラの制御
-				camera->Update(*player);
-				// スカイドーム制御
-				dome->SkydomeUpdate();
-
 				//当たり判定制御
 				for (int i = 0; i < HITCHECK_NUM; i++)
 				{
 					hitchecker[i]->Update(*player, *enemy);
 				}
+				// プレイヤー制御
+				//EnemyAttackRangeChecker test;
+				//const auto enemyattackRangeHitChecker = static_cast<const EnemyAttackRangeChecker*>(hitchecker[1]);
+				enemy->Update(*player, *static_cast<const EnemyAttackRangeChecker*>(hitchecker[1]));
+
+				player->Update(*input);
+				// カメラの制御
+				camera->Update(*player);
+				// スカイドーム制御
+				dome->SkydomeUpdate();
 
 				// 画面を初期化する
 				ClearDrawScreen();
@@ -225,7 +229,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			WaitTimer(FRAME_TIME - elapsedTime);
 		}
 	}
-
 
 	// Effekseerを終了する。
 	Effkseer_End();

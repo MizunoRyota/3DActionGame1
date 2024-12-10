@@ -1,1 +1,3 @@
-﻿  MyDxLibGame3D.vcxproj -> D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Debug\MyDxLibGame3D.exe
+﻿  Enemy.cpp
+D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Enemy.cpp(76,27): warning C4244: '=': 'int' から 'float' への変換です。データが失われる可能性があります。
+  MyDxLibGame3D.vcxproj -> D:\ゆいぜみ\school\2024ゆいゼミ\3DActionGame1\ActionGame1\Debug\MyDxLibGame3D.exe

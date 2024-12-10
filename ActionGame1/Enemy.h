@@ -1,7 +1,7 @@
 #pragma once
 
+class EnemyAttackRangeChecker;
 class Player;
-class EnemyAttackRangeChaecker;
 
 class Enemy
 {
@@ -10,38 +10,40 @@ public:
 	enum class State :int
 	{
 		None = -1,			//なし
-		Walk = 0,			//歩き
-		Run = 1,			//走り
-		BigDamage = 2,		//大ダメージ
-		SmallDamage = 3,	//小ダメージ
-		Magic = 4,			//魔法
-		Idol = 5,			//立ち止まり
-		Muscle = 6,			//マッスル
-		Blow = 7,			//殴り
-		Breath = 8,			//息を吐く
-		Die = 9,			//死
+		Die = 0,			//歩き
+		Walk = 1,			//走り
+		Run = 2,		//大ダメージ
+		Idol = 3,	//小ダメージ
+		Muscle = 4,			//魔法
+		TireIdol = 5,			//立ち止まり
+		Smalldmege = 6,			//マッスル
+		BigDamage = 7,			//殴り
+		Missile = 8,			//息を吐く
+		Blow = 9,			//死
 	};
 	enum class AnimKind : int
 	{
 		None = -1,			//なし
-		Walk = 0,			//歩き
-		Run = 1,			//走り
-		BigDamage = 2,		//大ダメージ
-		SmallDamage = 3,	//小ダメージ
-		Magic = 4,			//魔法
-		Idol = 5,			//立ち止まり
-		Muscle = 6,			//マッスル
-		Blow = 7,			//殴り
-		Breath = 8,			//息を吐く
-		Die = 9,			//死
+		Die = 0,			//歩き
+		Walk = 1,			//走り
+		Run = 2,		//大ダメージ
+		Idol = 3,	//小ダメージ
+		Muscle = 4,			//魔法
+		TireIdol = 5,			//立ち止まり
+		Smalldmege = 6,			//マッスル
+		BigDamage = 7,			//殴り
+		Missile = 8,			//息を吐く
+		Blow = 9,			//死
 	};
 
 	Enemy();
 	~Enemy();
 	void Load();									//初期化
-	void Update(const Player& player);				//更新
-	State UpdateEnemyState();						//
-
+	void InitializeAttack();
+	void ChangeTire();
+	void TireTimer();
+	void Update(const Player& player,const EnemyAttackRangeChecker& attackRange);				//更新
+	State UpdateEnemyState(const EnemyAttackRangeChecker& attackRange);						//
 	void UpdateShadow();							//影の更新
 	void UpdateAngle(const Player& player);			//向きの更新
 	void UpdateAnimationState(State prevState);		//
@@ -57,15 +59,22 @@ private:
 	static constexpr float AnimBlendSpeed = 0.1f;	// アニメーションのブレンド率変化速度
 	static constexpr float	MoveSpeed = 0.250f;		// 移動速度
 	static constexpr float Scale = 0.04f;  //大きさ
+	static constexpr float	AngleSpeed = 0.6f;		// 角度変化速度
 
 	//Enemy自身に関するメンバ変数
 	VECTOR position;
 	VECTOR angleVector;
+	float angle;
 	int EnemyHandle;
-
+	int hp;
 	//Enemyの攻撃に関するメンバ変数
 	bool isAttack;
+	bool isShortAttack;
+	bool isMiddleAttack;
+	bool isLongAttack;
+	bool tire;
 	bool attackReady;
+	float tireTimer;
 
 	//アニメーションに関するメンバ変数
 	State currentState;				//現在のアニメーションの状態

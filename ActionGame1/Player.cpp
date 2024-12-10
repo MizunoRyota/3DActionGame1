@@ -9,7 +9,7 @@ Player::Player()
 	:position(VGet(0.0f, 0.0f, 0.0f))
 	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
-	, returnRange(30.0f)
+	, returnRange(20.0f)
 	, PlayerHandle(-1)
 	, angle(0.0f)
 
@@ -68,7 +68,7 @@ void Player::Update(const Input& input)
 	//AttackAnimKind atttackAnim=currentAttack;
 	// ƒQ[ƒ€ó‘Ô•Ï‰»
 
-     	currentState = UpdateMoveParameterWithPad(input, moveVec);
+    currentState = UpdateMoveParameterWithPad(input, moveVec);
 
 	// ‚Ú‚½‚ñ‚¨‚µ‚½‚ç
 	if (CheckHitKey(KEY_INPUT_G))

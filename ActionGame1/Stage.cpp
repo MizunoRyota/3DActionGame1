@@ -22,9 +22,8 @@ void Stage::Load()
 {
     StageHandle = MV1LoadModel("data/model/stage/NewStage.mv1");
 	// エフェクトリソースを読み込む。
-	effectHandle = LoadEffekseerEffect("data/effekseer/EfkFile/AroundFire.efkefc",10.0f);
-
-
+	effectHandle = LoadEffekseerEffect("data/effekseer/EfkFile/GroundFire.efkefc",4.5f);
+	
 	SetScalePlayingEffekseer3DEffect(effectHandle, EffektScale, EffektScale,EffektScale);
     // 3Dモデルのスケール決定
     MV1SetScale(StageHandle, VGet(Scale, Scale, Scale));
@@ -49,7 +48,6 @@ void Stage::Update()
 
 	// Effekseerにより再生中のエフェクトを更新する。
 	UpdateEffekseer3D();
-
 
 	// 時間を経過させる。
 	time++;

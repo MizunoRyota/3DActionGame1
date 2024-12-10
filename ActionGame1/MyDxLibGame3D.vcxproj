@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AttackHitChecker.cpp" />
+    <ClCompile Include="AttackManager.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Color.cpp" />
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttackHitChecker.h" />
+    <ClInclude Include="AttackManager.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />

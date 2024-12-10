@@ -5,9 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="MyLib">
-      <UniqueIdentifier>{a7470f37-c5c2-41b7-b850-d52ad8defc41}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Environment">
       <UniqueIdentifier>{5541fda2-d8d2-497c-9729-c3f2e0b56939}</UniqueIdentifier>
     </Filter>
@@ -17,13 +14,19 @@
     <Filter Include="HitChecks">
       <UniqueIdentifier>{89ae011d-1916-40c3-abcd-092676c9d8c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\MyLib">
+      <UniqueIdentifier>{a7470f37-c5c2-41b7-b850-d52ad8defc41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Attack">
+      <UniqueIdentifier>{43df40af-9abd-4eb4-892a-faa1097b8f17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp">
-      <Filter>MyLib</Filter>
+      <Filter>ソース ファイル\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="Box.cpp">
-      <Filter>MyLib</Filter>
+      <Filter>ソース ファイル\MyLib</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>ソース ファイル</Filter>
@@ -35,9 +38,6 @@
       <Filter>Environment</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
       <Filter>Character</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -55,16 +55,22 @@
     <ClCompile Include="EnemyAttackRangeChecker.cpp">
       <Filter>HitChecks</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Character</Filter>
+    </ClCompile>
+    <ClCompile Include="AttackManager.cpp">
+      <Filter>Attack</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Pallet.h">
-      <Filter>MyLib</Filter>
+      <Filter>ソース ファイル\MyLib</Filter>
     </ClInclude>
     <ClInclude Include="Color.h">
-      <Filter>MyLib</Filter>
+      <Filter>ソース ファイル\MyLib</Filter>
     </ClInclude>
     <ClInclude Include="Box.h">
-      <Filter>MyLib</Filter>
+      <Filter>ソース ファイル\MyLib</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>ソース ファイル</Filter>
@@ -92,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="EnemyAttackRangeChecker.h">
       <Filter>HitChecks</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackManager.h">
+      <Filter>Attack</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
