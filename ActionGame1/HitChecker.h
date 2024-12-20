@@ -1,16 +1,16 @@
 #pragma once
 
 
-class HitChecker 
+class HitChecker
 {
 public:
 	HitChecker();
 	virtual~HitChecker();
-	 virtual void Update(const Player& player,const Enemy& enemy) ;		// 更新
-	 virtual bool CheckHit(const Player& player, const Enemy& enemy);	//当たり判定チェック
+	virtual void Update(const Player& player, const Enemy& enemy);		// 更新
+	virtual bool CheckHit(const Player& player, const Enemy& enemy);	//当たり判定チェック
 	virtual void DrawCircle();											//当たり判定の球描画
 protected:
-	static constexpr  float PlayerHight=0.8f;		//プレイヤーの高さ
+	static constexpr  float PlayerHight = 0.8f;		//プレイヤーの高さ
 	bool isHit;
 
 	//プレイヤーの当たり判定変数

@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AttackHitChecker.cpp" />
-    <ClCompile Include="AttackManager.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Color.cpp" />
@@ -30,12 +29,12 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RefrectAttack.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttackHitChecker.h" />
-    <ClInclude Include="AttackManager.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Color.h" />
@@ -45,6 +44,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Pallet.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="RefrectAttack.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Stage.h" />
   </ItemGroup>

@@ -58,7 +58,7 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>Character</Filter>
     </ClCompile>
-    <ClCompile Include="AttackManager.cpp">
+    <ClCompile Include="RefrectAttack.cpp">
       <Filter>Attack</Filter>
     </ClCompile>
   </ItemGroup>
@@ -99,7 +99,7 @@
     <ClInclude Include="EnemyAttackRangeChecker.h">
       <Filter>HitChecks</Filter>
     </ClInclude>
-    <ClInclude Include="AttackManager.h">
+    <ClInclude Include="RefrectAttack.h">
       <Filter>Attack</Filter>
     </ClInclude>
   </ItemGroup>

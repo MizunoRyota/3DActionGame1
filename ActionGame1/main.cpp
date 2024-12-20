@@ -29,8 +29,8 @@ const int HITCHECK_NUM = 2;
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	// 画面モードのセット
+	SetGraphMode(1600, 900, 32);
 	ChangeWindowMode(TRUE);
-	SetGraphMode(1920, 1080, 32);
 
 	// DXライブラリを初期化する。
 	if (DxLib_Init() == -1) return -1;

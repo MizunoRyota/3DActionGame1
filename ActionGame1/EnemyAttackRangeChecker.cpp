@@ -7,8 +7,8 @@
 #include"Player.h"
 
 EnemyAttackRangeChecker::EnemyAttackRangeChecker()
-    :AttackShrotRange(5.0f)
-    , AttackMiddleRange(15.0f)
+    :AttackShrotRange(3.0f)
+    , AttackMiddleRange(6.0f)
     , AttackLongRange(50.0f)
     , LengthRange(0)
 {

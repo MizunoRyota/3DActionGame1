@@ -12,10 +12,9 @@ Player::Player()
 	, returnRange(20.0f)
 	, PlayerHandle(-1)
 	, angle(0.0f)
-
 	,isAttack(false)
-	,isFirstAttack(false)
-	,isSecondAttack(false)
+	,isFirstAttack(true)
+	,isSecondAttack(true)
 	,isThirdAttack(false)
 	, currentState(State::Stand)
 	//, currentAttack(AttackAnimKind::UnKown)
@@ -80,7 +79,7 @@ void Player::Update(const Input& input)
 		printfDx("currentState%d\n", currentState);
 		printfDx("prevState%d\n",prevState);
 		printfDx("PlayAnim%d\n", PlayAnim);
-		printfDx("currentAttack%d\n", currentAttack);
+		//printfDx("currentAttack%d\n", currentAttack);
 		printfDx("isAttack%d\n", isAttack);
 	}
 	// アニメーションステートの更新
@@ -313,6 +312,7 @@ void Player::UpdateShadow()
 
 Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& moveVec)
 {
+
 	State nextState = currentState;
 
 	// このフレームでの移動ベクトルを初期化
@@ -320,61 +320,62 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 
 	// 移動したかどうかのフラグを初期状態では「移動していない」を表すFALSEにする
 	bool isMoveStick = false;
-
-	// 方向ボタン「←」が入力されたらカメラの見ている方向から見て左方向に移動する
-	if (input.GetNowFrameInput() & PAD_INPUT_LEFT)
+	if (!isAttack)
 	{
-		// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
-		moveVec = VAdd(moveVec, VGet(-1, 0, 0));
+		// 方向ボタン「←」が入力されたらカメラの見ている方向から見て左方向に移動する
+		if (input.GetNowFrameInput() & PAD_INPUT_LEFT)
+		{
+			// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
+			moveVec = VAdd(moveVec, VGet(-1, 0, 0));
 
-		// 移動したかどうかのフラグを「移動した」にする
-		isMoveStick = true;
+			// 移動したかどうかのフラグを「移動した」にする
+			isMoveStick = true;
 
-		//
-		isAttack = false;
-		isFirstAttack = false;
-		isSecondAttack = false;
+			//
+			isAttack = false;
+			isFirstAttack = false;
+			isSecondAttack = false;
+		}
+		else if (input.GetNowFrameInput() & PAD_INPUT_RIGHT)
+		{
+			// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
+			moveVec = VAdd(moveVec, VGet(1, 0, 0));
+
+			// 移動したかどうかのフラグを「移動した」にする
+			isMoveStick = true;
+
+			//
+			isAttack = false;
+			isFirstAttack = false;
+			isSecondAttack = false;
+		}
+		if (input.GetNowFrameInput() & PAD_INPUT_UP)
+		{
+			// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
+			moveVec = VAdd(moveVec, VGet(0, 0, 1));
+
+			// 移動したかどうかのフラグを「移動した」にする
+			isMoveStick = true;
+
+			isAttack = false;
+			isFirstAttack = false;
+			isSecondAttack = false;
+
+		}
+		else if (input.GetNowFrameInput() & PAD_INPUT_DOWN)
+		{
+			// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
+			moveVec = VAdd(moveVec, VGet(0, 0, -1));
+
+			// 移動したかどうかのフラグを「移動した」にする
+			isMoveStick = true;
+
+
+			isAttack = false;
+			isFirstAttack = false;
+			isSecondAttack = false;
+		}
 	}
-	else if (input.GetNowFrameInput() & PAD_INPUT_RIGHT)
-	{
-		// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
-		moveVec = VAdd(moveVec, VGet(1, 0, 0));
-
-		// 移動したかどうかのフラグを「移動した」にする
-		isMoveStick = true;
-
-		//
-		isAttack = false;
-		isFirstAttack = false;
-		isSecondAttack = false;
-	}
-	if (input.GetNowFrameInput() & PAD_INPUT_UP)
-	{
-		// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
-		moveVec = VAdd(moveVec, VGet(0, 0, 1));
-
-		// 移動したかどうかのフラグを「移動した」にする
-		isMoveStick = true;
-
-		isAttack = false;
-		isFirstAttack = false;
-		isSecondAttack = false;
-
-	}
-	else if (input.GetNowFrameInput() & PAD_INPUT_DOWN)
-	{
-		// 移動ベクトルに「←」が入力された時の移動ベクトルを加算する
-		moveVec = VAdd(moveVec, VGet(0, 0, -1));
-
-		// 移動したかどうかのフラグを「移動した」にする
-		isMoveStick = true;
-
-
-		isAttack = false;
-		isFirstAttack = false;
-		isSecondAttack = false;
-	}
-
 	// 移動ボタンが押されたかどうかで処理を分岐
 	if (isMoveStick)
 	{
@@ -516,7 +517,7 @@ void Player::UpdateAnimationState(State prevState)
 	 }
  }
 
- void Player::Move( VECTOR& moveVec)
+ void Player::Move(VECTOR& moveVec)
  {
 
 	 position = VAdd(position, moveVec);

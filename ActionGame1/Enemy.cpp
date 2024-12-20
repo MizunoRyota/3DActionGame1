@@ -1,6 +1,5 @@
 #include"DxLib.h"
 #include"EffekseerForDXLib.h"
-
 #include"Pallet.h"
 #include"Player.h"
 #include"Enemy.h"
@@ -8,42 +7,42 @@
 #include"EnemyAttackRangeChecker.h"
 
 Enemy::Enemy()
-    :position(VGet(0.0f,0.0f,10.0f))
-    ,angleVector(VGet(0,0,0))
-    , shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
-    , shadowToppos(VGet(0.0f, 0.0f, 0.0f))
+	:position(VGet(0.0f, 0.0f, 10.0f))
+	, angleVector(VGet(0, 0, 0))
+	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
+	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
 	, currentState(State::Idol)
+	,returnRange(20)
 	, animBlendRate(0.0f)
 	, prevPlayAnim(-1)
-    , ShadowRad(1.7f)
-	,tireTimer(0)
+	, ShadowRad(1.7f)
+	, tireTimer(0)
 	, prevPlayTime(0)
-	,isAttack(false)
-	,isShortAttack(false)
-	,isMiddleAttack(false)
-	,isLongAttack(false)
-	,tire(false)
+	, isAttack(false)
+	, isShortAttack(false)
+	, isMiddleAttack(false)
+	, isLongAttack(false)
+	,isChasing (false)
+	,limitRange(false)
+	, tire(false)
 	, playTime(0)
 {
-    //処理なし
+	//処理なし
 }
 
 Enemy::~Enemy()
 {
-    MV1DeleteModel(EnemyHandle);
+	MV1DeleteModel(EnemyHandle);
 }
 
 void Enemy::Load()
 {
-    // モデルの読み込み
-    EnemyHandle = MV1LoadModel("data/model/Enemy/Enemy.mv1");
-
-
-
-    // 3Dモデルのスケール決定
-    MV1SetScale(EnemyHandle, VGet(Scale, Scale, Scale));
-    // プレイヤーのモデルの座標を更新する
-    MV1SetPosition(EnemyHandle, position);
+	// モデルの読み込み
+	EnemyHandle = MV1LoadModel("data/model/Enemy/newEnemy.mv1");
+	// 3Dモデルのスケール決定
+	MV1SetScale(EnemyHandle, VGet(Scale, Scale, Scale));
+	// プレイヤーのモデルの座標を更新する
+	MV1SetPosition(EnemyHandle, position);
 }
 
 void Enemy::InitializeAttack()
@@ -56,7 +55,7 @@ void Enemy::InitializeAttack()
 
 void Enemy::ChangeTire()
 {
-	if (isAttack==true)
+	if (isAttack == true)
 	{
 		tire = true;
 	}
@@ -84,15 +83,86 @@ void Enemy::TireTimer()
 		}
 	}
 }
+void Enemy::LimitRange()
+{
+	////中心からプレイヤーの距離を測る
+
+	float r = VSize(VSub(position, VGet(0, 0, 0)));
+
+	////一定の距離に達したらそれ以上いけないようにする
+
+	if (r >= returnRange || r <= -returnRange)
+	{
+		limitRange = true;
+		//中心座標からプレイヤー座標の距離
+
+		VECTOR distance = VSub(VGet(0, 0, 0), position);
+
+		//正規化
+
+		distance = VNorm(distance);
+
+		//戻す量を計算、加算する
+
+		VECTOR returnPosition = VScale(distance, (r - returnRange));
+
+		position = VAdd(position, returnPosition);
+
+	}
+	else
+	{
+		limitRange = false;
+	}
+}
+
+void Enemy::RushAttack(const Player& player, const EnemyAttackRangeChecker& attackRange)
+{
+	if (!tire)
+	{
+		// プレイヤーと敵の位置ベクトル
+		VECTOR enemyPos = position;
+
+		// プレイヤーと敵の位置ベクトルの差分
+		VECTOR toTarget = VSub(player.GetPos(), enemyPos);
+
+		// ベクトルの長さ（距離）
+		float distance = VSize(angleVector);
+
+		// 目標に到達した場合、敵はそのまま進み続ける
+		if (attackRange.GetisShortWithin())
+		{
+			isChasing = true;
+		}
+
+		// 目標に到達していない場合のみ移動
+		if (!isChasing) {
+			// プレイヤーに向かって進む方向を単位ベクトルで求める
+			VECTOR direction = VNorm(angleVector);
+
+			// 敵が進む距離（移動速度に基づく）
+			VECTOR move = VScale(direction, MoveSpeed);
+
+			// 敵の位置を更新
+			position = VAdd(enemyPos, move);
+		}
+		else {
+			// 目標に到達した後はそのまま進み続ける
+			// ここで再度向きを決めてその方向に進み続ける（例えば方向を保持して突進）
+			VECTOR move = VScale(angleVector, MoveSpeed / distance);  // 現在位置から進む方向
+			position = VAdd(enemyPos, move);
+		}
+		printfDx("%f\n", distance);
+	}
+}
 
 void Enemy::Update(const Player& player, const EnemyAttackRangeChecker& attackRange)
 {
-    //今の状態を前の状態に変更
+	//今の状態を前の状態に変更
 	State prevState = currentState;
 
 	//疲れている状態の制限時間更新処理
 	TireTimer();
-	
+
 	if (CheckHitKey(KEY_INPUT_R))
 	{
 		clsDx();
@@ -103,29 +173,38 @@ void Enemy::Update(const Player& player, const EnemyAttackRangeChecker& attackRa
 		printfDx("prevState%d\n", prevState);
 		printfDx("PlayAnim%d\n", PlayAnim);
 		printfDx("isAttack%d\n", isAttack);
+		printfDx("limitRange%d\n", limitRange);
 		printfDx("isShortAttack%d\n", isShortAttack);
 		printfDx("isMiddleAttack%d\n", isMiddleAttack);
 		printfDx("isLongAttack%d\n", isLongAttack);
-
 	}
+
 	//現在のアニメーションの状態更新処理
-	currentState=UpdateEnemyState(attackRange);
+	currentState = UpdateEnemyState(attackRange);
 	//アニメーションの変更
 	UpdateAnimationState(prevState);
+	
+	//プレイヤーの方向をムク
+	UpdateAngle(player);
+
+	RushAttack(player, attackRange);
 
 
-    //プレイヤーの方向をムク
-    UpdateAngle(player);
-    //Enemyの影の更新
-    UpdateShadow();
+	LimitRange();
+
+	//Enemyの影の更新
+	UpdateShadow();
 
 	//アニメーション更新
 	UpdateAnimation();
+
+	// プレイヤーのモデルの座標を更新する
+	MV1SetPosition(EnemyHandle, position);
 }
 
 void Enemy::UpdateAngle(const Player& player)
 {
-	if (!isAttack)
+	if (!isAttack || !isChasing)
 	{
 		float Angle;
 		// ３Ｄモデル２から３Ｄモデル１に向かうベクトルを算出
@@ -145,7 +224,7 @@ Enemy::State Enemy::UpdateEnemyState(const EnemyAttackRangeChecker& attackRange)
 
 	State nextState = currentState;
 	//狭い範囲内にいるかつ攻撃中でないかつ疲れていない
-	if (attackRange.GetisLongWithin()&&!isAttack && !tire)
+	if (attackRange.GetisLongWithin() && !isAttack && !tire)
 	{
 		// もし今まで「立ち止まり」状態だったら
 		if (currentState == State::Idol)
@@ -154,34 +233,13 @@ Enemy::State Enemy::UpdateEnemyState(const EnemyAttackRangeChecker& attackRange)
 			nextState = State::Missile;
 		}
 	}
-	//少し遠い範囲内にいるかつ攻撃中でないかつ疲れていない
-	if (attackRange.GetisMiddleWithin() && !isAttack && !tire)
-	{
-		// もし今まで「立ち止まり」状態だったら
-		if (currentState == State::Idol)
-		{
-			// 状態を「走り」にする
-			nextState = State::Muscle;
-		}
-	}
-	//遠い範囲内にいるかつ攻撃中でないかつ疲れていない
-
-	if (attackRange.GetisShortWithin() && !isAttack && !tire)
-	{
-		// もし今まで「立ち止まり」状態だったら
-		if (currentState == State::Idol)
-		{
-			// 状態を「走り」にする
-			nextState = State::Blow;
-		}
-	}
 	//攻撃中の時に待機状態にする
 	if (isAttack)
 	{
-			nextState = State::Idol;
+		nextState = State::Idol;
 	}
 	// 疲れているアニメーションかつ状態フラグが疲れていない時待機状態にする
-	if (currentState == State::TireIdol&&!tire)
+	if (currentState == State::TireIdol && !tire)
 	{
 		// 状態を「待機」にする
 		nextState = State::Idol;
@@ -292,19 +350,19 @@ void Enemy::UpdateAnimationState(State prevState)
 	{
 		isAttack = true;
 		isLongAttack = true;
-		ChangeMotion(AnimKind::Missile);
+		ChangeMotion(AnimKind::Run);
 	}
 	if (prevState == State::Idol && currentState == State::Muscle)
 	{
 		isAttack = true;
 		isMiddleAttack = true;
-		ChangeMotion(AnimKind::Muscle);
+		ChangeMotion(AnimKind::Run);
 	}
-	if (prevState == State::Idol && currentState==State::Blow)
+	if (prevState == State::Idol && currentState == State::Blow)
 	{
 		isAttack = true;
 		isShortAttack = true;
-		ChangeMotion(AnimKind::Blow);
+		ChangeMotion(AnimKind::Run);
 	}
 	// 立ち止まりから走りに変わったら
 	if (prevState == State::Idol && currentState == State::Run)
@@ -319,7 +377,7 @@ void Enemy::UpdateAnimationState(State prevState)
 		ChangeMotion(AnimKind::Idol);
 	}
 
-	if (prevState == State::Idol&&currentState==State::TireIdol)
+	if (prevState == State::Idol && currentState == State::TireIdol)
 	{
 		ChangeMotion(AnimKind::TireIdol);
 	}
@@ -327,18 +385,18 @@ void Enemy::UpdateAnimationState(State prevState)
 
 void Enemy::UpdateShadow()
 {
-    shadowToppos = VGet(position.x, -0.1f, position.z);
-    shadowBottompos = VGet(position.x, position.y, position.z);
+	shadowToppos = VGet(position.x, -0.1f, position.z);
+	shadowBottompos = VGet(position.x, position.y, position.z);
 }
 
 void Enemy::DrawShadow()
 {
-    DrawCone3D(shadowToppos, shadowBottompos, ShadowRad, 8, Pallet::Black.GetHandle(), Pallet::Black.GetHandle(), TRUE);
+	DrawCone3D(shadowToppos, shadowBottompos, ShadowRad, 8, Pallet::Black.GetHandle(), Pallet::Black.GetHandle(), TRUE);
 }
 
 void Enemy::Draw()
 {
 
-    DrawShadow();
-    MV1DrawModel(EnemyHandle);
+	DrawShadow();
+	MV1DrawModel(EnemyHandle);
 }

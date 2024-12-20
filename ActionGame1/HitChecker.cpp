@@ -20,7 +20,6 @@ HitChecker::HitChecker()
 
 HitChecker::~HitChecker()
 {
-
 }
 
 void HitChecker::Update(const Player& player,const Enemy& enemy  )

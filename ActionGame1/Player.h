@@ -17,8 +17,8 @@ public:
 	};
 	enum class AnimKind : int
 	{
-		None = -1,		// なし
-		Unkown = 0,	// 不明
+		None = -1,				// なし
+		Unkown = 0,				// 不明
 		FinishAttack = 1,		// とどめの一撃
 		FirstAttack = 2,		// 最初の攻撃
 		SecondAttack = 3,		// 2段目の攻撃
@@ -28,16 +28,6 @@ public:
 		Idol = 7,				//立ち止まり
 		Run = 8,				//走る
 		TakeDamage = 9,			//ダメージを受ける
-	};
-
-	enum class AttackAnimKind : int
-	{
-		Nome = -1,				//なし
-		UnKown = 0,				//不明
-		FinishAttack = 1,		// とどめの一撃
-		FirstAttack = 2,		// 最初の攻撃
-		SecondAttack = 3,		// 2段目の攻撃
-		LastAttack = 4,			// 最後の攻撃
 	};
 
 	Player();
@@ -83,7 +73,7 @@ private:
 
 	//アニメーションに関するメンバ変数
 	State currentState;				//現在のアニメーションの状態
-	AttackAnimKind currentAttack;	//現在の攻撃アニメーションの状態
+	//AttackAnimKind currentAttack;	//現在の攻撃アニメーションの状態
 	float playTime;					//アニメーションの時間の合計
 	int PlayAnim;					//現在のアニメーションアタッチ番号
 	int AttachIndex;				//アニメーションを付与される変数
@@ -103,11 +93,6 @@ private:
 	void UpdateAttackState(State prevState);
 	void UpdateAttack();
 	 
-
-
-
-
-
 
 	// アニメーションステートの更新
 	/*void ChangeAttackMotion(AttackAnimKind prevAnimKind);*/
