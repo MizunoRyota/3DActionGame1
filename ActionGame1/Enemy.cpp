@@ -11,7 +11,7 @@ Enemy::Enemy()
 	, angleVector(VGet(0, 0, 0))
 	, shadowBottompos(VGet(0.0f, 0.0f, 0.0f))
 	, shadowToppos(VGet(0.0f, 0.0f, 0.0f))
-	, currentState(State::Idol)
+	, currentState(State::TireIdol)
 	,returnRange(20)
 	, animBlendRate(0.0f)
 	, prevPlayAnim(-1)
@@ -19,13 +19,12 @@ Enemy::Enemy()
 	, tireTimer(0)
 	, prevPlayTime(0)
 	, isAttack(false)
-	, isShortAttack(false)
-	, isMiddleAttack(false)
-	, isLongAttack(false)
 	,isChasing (false)
+	,isCharge(true)
 	,limitRange(false)
 	, tire(false)
 	, playTime(0)
+	, attackTimer(0)
 {
 	//処理なし
 }
@@ -48,9 +47,6 @@ void Enemy::Load()
 void Enemy::InitializeAttack()
 {
 	isAttack = false;
-	isShortAttack = false;
-	isMiddleAttack = false;
-	isLongAttack = false;
 }
 
 void Enemy::ChangeTire()
@@ -63,6 +59,11 @@ void Enemy::ChangeTire()
 	{
 		tire = false;
 	}
+}
+
+void Enemy::ChangeChasing()
+{
+	isChasing = true;
 }
 
 void Enemy::TireTimer()
@@ -79,10 +80,32 @@ void Enemy::TireTimer()
 		if (GetNowCount() - tireTimer >= 3000)
 		{
 			tire = false;
+			isCharge = true;
+
 			tireTimer = 0;
 		}
 	}
 }
+
+void Enemy::AttackTimer()
+{
+	if (isAttack == true)
+	{
+		// 初回の呼び出し時に開始時刻を設定
+		if (attackTimer == 0)
+		{
+			attackTimer = GetNowCount();  // ミリ秒単位で現在時刻を取得
+		}
+		// 経過時間が3000ミリ秒(3秒)以上経過したらフラグを切り替える
+		if (GetNowCount() - attackTimer >= 15000)
+		{
+			attackTimer = 0;
+			ChangeTire();
+			isAttack = false;
+		}
+	}
+}
+
 void Enemy::LimitRange()
 {
 	////中心からプレイヤーの距離を測る
@@ -117,7 +140,7 @@ void Enemy::LimitRange()
 
 void Enemy::RushAttack(const Player& player, const EnemyAttackRangeChecker& attackRange)
 {
-	if (!tire)
+	if (!tire && isAttack && !isCharge)
 	{
 		// プレイヤーと敵の位置ベクトル
 		VECTOR enemyPos = position;
@@ -175,8 +198,8 @@ void Enemy::Update(const Player& player, const EnemyAttackRangeChecker& attackRa
 		printfDx("isAttack%d\n", isAttack);
 		printfDx("limitRange%d\n", limitRange);
 		printfDx("isShortAttack%d\n", isShortAttack);
-		printfDx("isMiddleAttack%d\n", isMiddleAttack);
-		printfDx("isLongAttack%d\n", isLongAttack);
+		//printfDx("isMiddleAttack%d\n", isMiddleAttack);
+		//printfDx("isLongAttack%d\n", isLongAttack);
 	}
 
 	//現在のアニメーションの状態更新処理
@@ -189,15 +212,14 @@ void Enemy::Update(const Player& player, const EnemyAttackRangeChecker& attackRa
 
 	RushAttack(player, attackRange);
 
+	AttackTimer();
 
 	LimitRange();
 
 	//Enemyの影の更新
 	UpdateShadow();
-
 	//アニメーション更新
 	UpdateAnimation();
-
 	// プレイヤーのモデルの座標を更新する
 	MV1SetPosition(EnemyHandle, position);
 }
@@ -224,26 +246,26 @@ Enemy::State Enemy::UpdateEnemyState(const EnemyAttackRangeChecker& attackRange)
 
 	State nextState = currentState;
 	//狭い範囲内にいるかつ攻撃中でないかつ疲れていない
-	if (attackRange.GetisLongWithin() && !isAttack && !tire)
+	if (!isAttack && !tire&&isCharge)
 	{
 		// もし今まで「立ち止まり」状態だったら
-		if (currentState == State::Idol)
+		if (currentState == State::TireIdol)
 		{
 			// 状態を「走り」にする
-			nextState = State::Missile;
+			nextState = State::Charge;
 		}
 	}
 	//攻撃中の時に待機状態にする
-	if (isAttack)
+	if (currentState==State::Charge&&isCharge==false)
 	{
-		nextState = State::Idol;
+		nextState = State::Run;
 	}
 	// 疲れているアニメーションかつ状態フラグが疲れていない時待機状態にする
-	if (currentState == State::TireIdol && !tire)
-	{
-		// 状態を「待機」にする
-		nextState = State::Idol;
-	}
+	//if (currentState == State::TireIdol && !tire)
+	//{
+	//	// 状態を「待機」にする
+	//	nextState = State::Charge;
+	//}
 	//状態フラグが疲れているとき状態をtireIdolにする
 	if (tire)
 	{
@@ -275,7 +297,6 @@ void Enemy::ChangeMotion(AnimKind motionNum)
 
 	// ブレンド率はPrevが有効ではない場合は１．０ｆ( 現在モーションが１００％の状態 )にする
 	animBlendRate = prevPlayAnim == -1 ? 1.0f : 0.0f;
-
 }
 
 void Enemy::UpdateAnimation()
@@ -307,8 +328,12 @@ void Enemy::UpdateAnimation()
 			// 再生時間がアニメーションの総再生時間に達したら再生時間を０に戻す
 			if (playTime >= animTotalTime)
 			{
-				ChangeTire();
-				InitializeAttack();
+
+				if (currentState==State::Charge)
+				{
+					isCharge = false;
+				}
+				//InitializeAttack();
 				playTime = static_cast<float>(fmod(playTime, animTotalTime));
 			}
 
@@ -346,38 +371,20 @@ void Enemy::UpdateAnimation()
 /// </summary>
 void Enemy::UpdateAnimationState(State prevState)
 {
-	if (prevState == State::Idol && currentState == State::Missile)
+	if (prevState == State::TireIdol && currentState == State::Charge)
 	{
-		isAttack = true;
-		isLongAttack = true;
-		ChangeMotion(AnimKind::Run);
+		ChangeMotion(AnimKind::Charge);
 	}
-	if (prevState == State::Idol && currentState == State::Muscle)
+	if (prevState == State::Charge && currentState == State::Run)
 	{
 		isAttack = true;
-		isMiddleAttack = true;
-		ChangeMotion(AnimKind::Run);
-	}
-	if (prevState == State::Idol && currentState == State::Blow)
-	{
-		isAttack = true;
-		isShortAttack = true;
 		ChangeMotion(AnimKind::Run);
 	}
 	// 立ち止まりから走りに変わったら
-	if (prevState == State::Idol && currentState == State::Run)
-	{
-		// 走りアニメーションを再生する
-		ChangeMotion(AnimKind::Run);
-	}
-	// 走りから立ち止まりに変わったら
-	if (prevState == State::Run && currentState == State::Idol)
-	{
-		// 立ち止りアニメーションを再生する
-		ChangeMotion(AnimKind::Idol);
-	}
 
-	if (prevState == State::Idol && currentState == State::TireIdol)
+	// 走りから立ち止まりに変わったら
+
+	if (prevState == State::Run && currentState == State::TireIdol)
 	{
 		ChangeMotion(AnimKind::TireIdol);
 	}

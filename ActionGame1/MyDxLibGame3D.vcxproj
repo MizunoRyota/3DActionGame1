@@ -24,12 +24,11 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyAttackRangeChecker.cpp" />
+    <ClCompile Include="EnemyAttackHitRangeChecker.cpp" />
     <ClCompile Include="HitChecker.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="RefrectAttack.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
@@ -44,7 +43,6 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Pallet.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="RefrectAttack.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="Stage.h" />
   </ItemGroup>

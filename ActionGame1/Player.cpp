@@ -360,7 +360,6 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 			isAttack = false;
 			isFirstAttack = false;
 			isSecondAttack = false;
-
 		}
 		else if (input.GetNowFrameInput() & PAD_INPUT_DOWN)
 		{
@@ -402,7 +401,7 @@ Player::State Player::UpdateMoveParameterWithPad(const Input& input, VECTOR& mov
 			// 状態を「立ち止り」にする
 			nextState = State::Stand;
 		}
- 		else if (currentState == State::FirstAttack|| currentState == State::SecondAttack|| currentState == State::LastAttack && !isAttack)
+		else if (currentState == State::FirstAttack || currentState == State::SecondAttack || currentState == State::LastAttack && !isAttack)
 		{
 			// 状態を「立ち止り」にする
 			nextState = State::Stand;

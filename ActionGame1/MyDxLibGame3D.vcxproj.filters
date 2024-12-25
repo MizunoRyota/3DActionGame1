@@ -49,17 +49,14 @@
     <ClCompile Include="HitChecker.cpp">
       <Filter>HitChecks</Filter>
     </ClCompile>
-    <ClCompile Include="AttackHitChecker.cpp">
-      <Filter>HitChecks</Filter>
-    </ClCompile>
-    <ClCompile Include="EnemyAttackRangeChecker.cpp">
-      <Filter>HitChecks</Filter>
-    </ClCompile>
     <ClCompile Include="Enemy.cpp">
       <Filter>Character</Filter>
     </ClCompile>
-    <ClCompile Include="RefrectAttack.cpp">
-      <Filter>Attack</Filter>
+    <ClCompile Include="AttackHitChecker.cpp">
+      <Filter>HitChecks</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyAttackHitRangeChecker.cpp">
+      <Filter>HitChecks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -87,9 +84,6 @@
     <ClInclude Include="Player.h">
       <Filter>Character</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>Character</Filter>
-    </ClInclude>
     <ClInclude Include="HitChecker.h">
       <Filter>HitChecks</Filter>
     </ClInclude>
@@ -99,8 +93,8 @@
     <ClInclude Include="EnemyAttackRangeChecker.h">
       <Filter>HitChecks</Filter>
     </ClInclude>
-    <ClInclude Include="RefrectAttack.h">
-      <Filter>Attack</Filter>
+    <ClInclude Include="Enemy.h">
+      <Filter>Character</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

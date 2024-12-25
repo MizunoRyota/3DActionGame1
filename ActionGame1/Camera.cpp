@@ -30,7 +30,7 @@ Camera::~Camera()
 void Camera::Load()
 {
     Hight = 1.5f;
-    Zoom = -5.0f;
+    Zoom = -4.0f;
     position = VGet(0, Hight, Zoom);
 }
 
